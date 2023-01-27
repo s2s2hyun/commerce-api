@@ -14,10 +14,12 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
+    //path 쉽게 설정하기 위해서
+    "baseUrl": "",
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@components/*": ["components/*"]
+    },
+    "types": ["@emotion/react/types/css-prop"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
