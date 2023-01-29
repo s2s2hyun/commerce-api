@@ -1,12 +1,25 @@
+import { PrismaClient } from '@prisma/client';
 import Head from 'next/head';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+const prisma = new PrismaClient();
 
-export default function Home({ time }: { time: string }) {
-  const handleClick = () => {
-    fetch('/api/add-item?name=Jacket')
+export default function Home() {
+  // const [products, setProducts] = useState<
+  //   { id: string; properties: { id: string }[] }[]
+  // >([]);
+  const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/get-products')
       .then((res) => res.json())
-      .then((data) => alert(data.message));
-  };
+      .then((data) => {
+        if (data.items) {
+          setProducts(data.items);
+        }
+      })
+      .catch((error) => console.log(error));
+  }, []);
 
   return (
     <>
@@ -17,21 +30,24 @@ export default function Home({ time }: { time: string }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <h1>{time}</h1>
+        {/* <h1>{time}</h1> */}
         <h1>
           <Link href="/ssg">ssg</Link>
         </h1>
         <h1>
           <Link href="/isr">isr</Link>
         </h1>
+        <p>Products Listd</p>
+        {products &&
+          products?.map((item) => <div key={item.id}>{item.name}</div>)}
       </main>
     </>
   );
 }
 
 export async function getServerSideProps() {
-  console.log('server');
+  const products = await prisma.products.findMany();
   return {
-    props: { time: new Date().toISOString() },
+    props: { products },
   };
 }
