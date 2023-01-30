@@ -1,14 +1,32 @@
+import styled from '@emotion/styled';
 import { PrismaClient } from '@prisma/client';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Button from 'src/components/Button';
 const prisma = new PrismaClient();
+
+const MainWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`;
+
+const ProductList = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 export default function Home() {
   // const [products, setProducts] = useState<
   //   { id: string; properties: { id: string }[] }[]
   // >([]);
-  const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
+  const [products, setProducts] = useState<
+    { id: string; name: string; createdAt: string }[]
+  >([]);
 
   useEffect(() => {
     fetch('/api/get-products')
@@ -29,7 +47,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main>
+      <MainWrapper>
         {/* <h1>{time}</h1> */}
         <h1>
           <Link href="/ssg">ssg</Link>
@@ -37,17 +55,32 @@ export default function Home() {
         <h1>
           <Link href="/isr">isr</Link>
         </h1>
-        <p>Products Listd</p>
-        {products &&
-          products?.map((item) => <div key={item.id}>{item.name}</div>)}
-      </main>
+        <ProductList>
+          <p>Products Listd</p>
+          {products &&
+            products?.map((item) => (
+              <div key={item.id}>
+                {item.name}
+                <p>{item.createdAt}</p>
+              </div>
+            ))}
+        </ProductList>
+        <Button>Add Jacket2</Button>
+      </MainWrapper>
     </>
   );
 }
 
 export async function getServerSideProps() {
   const products = await prisma.products.findMany();
+  const productsWithCreatedAtAsString = products.map((product) => {
+    const { createdAt, ...rest } = product;
+    return {
+      ...rest,
+      createdAt: createdAt.toISOString(),
+    };
+  });
   return {
-    props: { products },
+    props: { products: productsWithCreatedAtAsString },
   };
 }

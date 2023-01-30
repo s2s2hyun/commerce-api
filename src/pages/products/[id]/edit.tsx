@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Carousel from 'nuka-carousel';
 import Image from 'next/image';
 import CustomEditor from 'src/components/Editor';
 import { useRouter } from 'next/router';
-import { EditorState } from 'draft-js';
+import { convertFromRaw, EditorState } from 'draft-js';
 
 const images = [
   {
@@ -69,12 +69,31 @@ export default function Products() {
     undefined
   );
 
+  useEffect(() => {
+    if (productId != null) {
+      fetch(`/api/get-product?id=${productId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.items && data.items.contents) {
+            setEditorState(
+              EditorState.createWithContent(
+                convertFromRaw(JSON.parse(data.items.contents))
+              )
+            );
+          } else {
+            setEditorState(EditorState.createEmpty());
+          }
+        });
+    }
+  }, [productId]);
+
   const handleSave = () => {
     alert('save');
   };
 
   return (
     <>
+      <div>edit</div>
       <Carousel
         animation="zoom"
         autoplay

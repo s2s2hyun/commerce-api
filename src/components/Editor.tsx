@@ -24,7 +24,7 @@ export default function CustomEditor({
   onSave,
 }: {
   editorState: EditorState;
-  readOnly: boolean;
+  readOnly?: boolean;
   onSave?: () => void;
   onEditorStateChange?: Dispatch<SetStateAction<EditorState | undefined>>;
 }) {
