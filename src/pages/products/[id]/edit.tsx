@@ -4,7 +4,7 @@ import Carousel from 'nuka-carousel';
 import Image from 'next/image';
 import CustomEditor from 'src/components/Editor';
 import { useRouter } from 'next/router';
-import { convertFromRaw, EditorState } from 'draft-js';
+import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 
 const images = [
   {
@@ -88,7 +88,21 @@ export default function Products() {
   }, [productId]);
 
   const handleSave = () => {
-    alert('save');
+    if (editorState) {
+      fetch(`/api/update-product`, {
+        method: 'POST',
+        body: JSON.stringify({
+          id: String(productId),
+          contents: JSON.stringify(
+            convertToRaw(editorState.getCurrentContent())
+          ),
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          alert('Success!');
+        });
+    }
   };
 
   return (

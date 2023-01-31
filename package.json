@@ -12,10 +12,11 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@mantine/core": "^5.10.2",
+    "@mantine/hooks": "^5.10.2",
     "@next/font": "13.1.0",
     "@notionhq/client": "^2.2.3",
     "@prisma/client": "^4.9.0",
-    "@types/node": "18.11.17",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",
     "draft-js": "^0.11.7",
@@ -33,16 +34,18 @@
   },
   "devDependencies": {
     "@types/draft-js": "^0.11.10",
+    "@types/node": "^18.11.18",
     "@types/react-draft-wysiwyg": "^1.13.4",
     "@types/react-image-gallery": "^1.2.0",
     "autoprefixer": "^10.4.13",
     "husky": "^8.0.2",
     "lint-staged": "^13.1.0",
     "next-sitemap": "^3.1.47",
-    "postcss": "^8.4.20",
+    "postcss": "^8.4.21",
     "prettier": "^2.8.1",
     "prisma": "^4.9.0",
-    "tailwindcss": "^3.2.4"
+    "tailwindcss": "^3.2.4",
+    "ts-node": "^10.9.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
