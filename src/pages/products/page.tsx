@@ -2,80 +2,148 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { categories, products } from '@prisma/client';
 import Image from 'next/image';
 import styled from '@emotion/styled';
-import { Pagination, SegmentedControl } from '@mantine/core';
-import { CATEGORY_MAP, TAKE } from 'src/constants/products';
+import { Input, Pagination, SegmentedControl, Select } from '@mantine/core';
+import { CATEGORY_MAP, FILTERS, TAKE } from 'src/constants/products';
+import { IconSearch } from '@tabler/icons';
+import MyIcon from '../../components/commons/stlyes/MyIcon';
+import useDebounce from 'hooks/useDebounce';
+import { useQuery } from '@tanstack/react-query';
 
 // const TAKE = 9;
+type Category = {
+  id: number;
+  name: string;
+};
 
 export default function Products() {
   const [activePage, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [categories, setCategories] = useState<categories[]>([]);
+  // const [categories, setCategories] = useState<categories[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('-1');
   //   const [skip, setSkip] = useState<number>(0);
-  const [products, setProducts] = useState<products[]>([]);
+  // const [products, setProducts] = useState<products[]>([]);
 
-  useEffect(() => {
-    fetch(`/api/get-categories`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items) {
-          setCategories(data.items);
-        }
-      })
-      .catch((error) => console.log(error));
+  // constants 에 있는 배열안에 있는 객체의 0번째 최신순 / 1번째 가격 높은순 / 2번째 가격이 낮은순 셋팅
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(
+    FILTERS[0].value
+  );
+  // 검색구현
+  const [keyword, setKeyword] = useState<string>('');
 
-    // fetch(`/api/get-products?skip=0&take=${TAKE}&category=${selectedCategory}`)
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     if (data.items) {
-    //       setProducts(data.items);
-    //     }
-    //   })
-    //   .catch((error) => console.log(error));
-  }, []);
+  const debouncedKeyword = useDebounce<string>(keyword);
 
-  useEffect(() => {
-    fetch(`/api/get-products-count?category=${selectedCategory}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items) {
-          setTotal(Math.ceil(data.items / TAKE));
-        }
-      })
-      .catch((error) => console.log(error));
-  }, [selectedCategory]);
+  // 카테고리 fetch
+  // useEffect(() => {
+  //   fetch(`/api/get-categories`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       if (data.items) {
+  //         setCategories(data.items);
+  //       }
+  //     })
+  //     .catch((error) => console.log(error));
+  // }, []);
 
-  useEffect(() => {
-    const skip = TAKE * (activePage - 1);
-    fetch(
-      `/api/get-products?skip=${skip}&take=${TAKE}&category=${selectedCategory}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items) {
-          setProducts(data.items);
-        }
-      })
-      .catch((error) => console.log(error));
-  }, [activePage, selectedCategory]);
+  const { data } = useQuery<{ items: Category[] }, unknown, Category[]>(
+    [`/api/get-categories`],
+    () => fetch(`/api/get-categories`).then((res) => res.json()),
+    {
+      select: (data) => data.items,
+    }
+  );
 
-  //   const getProducts = useCallback(() => {
-  //     const next = skip + TAKE;
-  //     fetch(`/api/get-products?skip=${next}&take=${TAKE}`)
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         if (data.items) {
-  //           const list = products.concat(data.items);
-  //           setProducts(list);
-  //         }
-  //       })
-  //       .catch((error) => console.log(error));
-  //     setSkip(next);
-  //   }, [skip, products]);
+  const categories = data;
+  // const [categories, setCategories] = useState<categories[]>([]); 위에 주석처리를 해두었다.
+
+  // 카테고리 변경에 따라 일부 부작용을 수행하려는 경우 useEffect 를 사용할수 있다.
+  // useEffect(() => {
+  //   console.log(categories);
+  // }, [categories]);
+
+  // useEffect(() => {
+  //   fetch(
+  //     `/api/get-products-count?category=${selectedCategory}&contains=${debouncedKeyword}`
+  //   )
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       if (data.items) {
+  //         setTotal(Math.ceil(data.items / TAKE));
+  //       }
+  //     })
+  //     .catch((error) => console.log(error));
+  // }, [selectedCategory, debouncedKeyword]);
+
+  const { data: totalData } = useQuery(
+    [
+      `/api/get-products-count?category=${selectedCategory}&contains=${debouncedKeyword}`,
+    ],
+    () =>
+      fetch(
+        `/api/get-products-count?category=${selectedCategory}&contains=${debouncedKeyword}`
+      )
+        .then((res) => res.json())
+        .then((data) => Math.ceil(data.items / TAKE))
+  );
+
+  // react Query 셋팅전에 주석처리
+  // useEffect(() => {
+  //   const skip = TAKE * (activePage - 1);
+  //   fetch(
+  //     `/api/get-products?skip=${skip}&take=${TAKE}&category=${selectedCategory}&orderBy=${selectedFilter}&contains=${debouncedKeyword}`
+  //   )
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       if (data.items) {
+  //         setProducts(data.items);
+  //       }
+  //     })
+  //     .catch((error) => console.log(error));
+  // }, [activePage, selectedCategory, selectedFilter, debouncedKeyword]);
+  // useEffect 가 아닌 react Query 를 통해서 api 호출
+  const { data: products } = useQuery<
+    { items: products[] },
+    unknown,
+    products[]
+  >(
+    [
+      `/api/get-products?skip=${
+        TAKE * (activePage - 1)
+      }&take=${TAKE}&category=${selectedCategory}&orderBy=${selectedFilter}&contains=${debouncedKeyword}`,
+    ],
+    () =>
+      fetch(
+        `/api/get-products?skip=${
+          TAKE * (activePage - 1)
+        }&take=${TAKE}&category=${selectedCategory}&orderBy=${selectedFilter}&contains=${debouncedKeyword}`
+      ).then((res) => res.json()),
+    {
+      select: (data) => data.items,
+    }
+  );
+
+  // console.log(typeof products, '타입');
+
+  const handlerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setKeyword(e.target.value);
+  };
 
   return (
     <div className="px-36 mt-36 mb-36">
+      <div className="mb-4">
+        <Input
+          placeholder="search"
+          icon={<MyIcon />}
+          value={keyword}
+          onChange={handlerChange}
+        />
+      </div>
+      <div className="mb-4">
+        <Select
+          value={selectedFilter}
+          onChange={setSelectedFilter}
+          data={FILTERS}
+        />
+      </div>
       {categories && (
         <div className="mb-4">
           <SegmentedControl
@@ -131,12 +199,14 @@ export default function Products() {
         더보기
       </button> */}
       <div className="w-full flex mt-5">
-        <Pagination
-          className="m-auto"
-          page={activePage}
-          onChange={setPage}
-          total={total}
-        />
+        {totalData && (
+          <Pagination
+            className="m-auto"
+            page={activePage}
+            onChange={setPage}
+            total={totalData}
+          />
+        )}
       </div>
     </div>
   );
