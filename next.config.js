@@ -11,6 +11,8 @@ const nextConfig = {
       'raw.githubusercontent.com',
       'static.shoeprize.com',
       'ithk-pro-itmall-item.oss-cn-hongkong.aliyuncs.com',
+      'cdn.mustit.co.kr',
+      'image.mustit.co.kr',
     ],
   },
 };

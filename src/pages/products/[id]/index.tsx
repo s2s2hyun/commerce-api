@@ -5,87 +5,35 @@ import Image from 'next/image';
 import CustomEditor from 'src/components/Editor';
 import { useRouter } from 'next/router';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { products } from '@prisma/client';
 
-const images = [
-  {
-    original: 'https://picsum.photos/id/1018/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1018/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1015/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1015/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1019/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1019/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1016/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1016/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1013/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1013/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1011/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1011/250/150/',
-  },
-  {
-    original: 'https://picsum.photos/id/1012/1000/600/',
-    thumbnail: 'https://picsum.photos/id/1012/250/150/',
-  },
-  {
-    original:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/4v.jpg',
-    thumbnail:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/4v.jpg',
-  },
-  {
-    original:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/1.jpg',
-    thumbnail:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/1.jpg',
-  },
-  {
-    original:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/2.jpg',
-    thumbnail:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/2.jpg',
-  },
-  {
-    original:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/3.jpg',
-    thumbnail:
-      'https://raw.githubusercontent.com/xiaolin/react-image-gallery/master/static/3.jpg',
-  },
-];
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const product = await fetch(
+    `http://localhost:3000/api/get-product?id=${context.params?.id}`
+  )
+    .then((data) => data.json())
+    .then((data) => data.items);
+  return { props: { product: { ...product, images: [product.image_url] } } };
+}
 
-export default function Products() {
+export default function Products(props: {
+  product: products & { images: string[] };
+}) {
   const [index, setIndex] = useState<number>(0);
   const router = useRouter();
   const { id: productId } = router.query;
-  const [editorState, setEditorState] = useState<EditorState | undefined>(
-    undefined
+  const [editorState] = useState<EditorState | undefined>(() =>
+    props.product.contents
+      ? EditorState.createWithContent(
+          convertFromRaw(JSON.parse(props.product.contents))
+        )
+      : EditorState.createEmpty()
   );
 
-  useEffect(() => {
-    if (productId != null) {
-      fetch(`/api/get-product?id=${productId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.items && data.items.contents) {
-            setEditorState(
-              EditorState.createWithContent(
-                convertFromRaw(JSON.parse(data.items.contents))
-              )
-            );
-          } else {
-            setEditorState(EditorState.createEmpty());
-          }
-        });
-    }
-  }, [productId]);
+  const product = props.product;
+
+  // EditorState.createEmpty()
 
   return (
     <>
@@ -98,21 +46,20 @@ export default function Products() {
         speed={5}
         slideIndex={index}
       >
-        {images.map((item) => (
+        {product.images.map((url, index) => (
           <Image
-            key={item.original}
-            src={item.original}
+            key={`${url}-carousel-${index}`}
+            src={url}
             alt="img"
-            width={1000}
-            height={500}
-            layout="responsive"
+            width={500}
+            height={300}
           />
         ))}
       </Carousel>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {images.map((item, index) => (
-          <div key={index} onClick={() => setIndex(index)}>
-            <Image src={item.original} alt="img" width={100} height={100} />
+        {product.images.map((url, index) => (
+          <div key={`${url}-thumb-${index}`} onClick={() => setIndex(index)}>
+            <Image src={url} alt="img" width={100} height={100} />
           </div>
         ))}
       </div>

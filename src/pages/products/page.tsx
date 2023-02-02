@@ -8,6 +8,9 @@ import { IconSearch } from '@tabler/icons';
 import MyIcon from '../../components/commons/stlyes/MyIcon';
 import useDebounce from 'hooks/useDebounce';
 import { useQuery } from '@tanstack/react-query';
+import { Session } from 'inspector';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 // const TAKE = 9;
 type Category = {
@@ -16,8 +19,10 @@ type Category = {
 };
 
 export default function Products() {
+  const { data: session } = useSession();
   const [activePage, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
+
   // const [categories, setCategories] = useState<categories[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('-1');
   //   const [skip, setSkip] = useState<number>(0);
@@ -31,7 +36,7 @@ export default function Products() {
   const [keyword, setKeyword] = useState<string>('');
 
   const debouncedKeyword = useDebounce<string>(keyword);
-
+  const router = useRouter();
   // 카테고리 fetch
   // useEffect(() => {
   //   fetch(`/api/get-categories`)
@@ -129,6 +134,10 @@ export default function Products() {
 
   return (
     <div className="px-36 mt-36 mb-36">
+      {session && (
+        <p style={{ fontSize: '2rem' }}>안녕하세요 , {session.user?.name}님</p>
+      )}
+
       <div className="mb-4">
         <Input
           placeholder="search"
@@ -168,7 +177,11 @@ export default function Products() {
       {products && (
         <div className="grid grid-cols-3 gap-5">
           {products.map((item) => (
-            <div key={item.id} style={{ maxWidth: 300 }}>
+            <div
+              key={item.id}
+              style={{ maxWidth: 300 }}
+              onClick={() => router.push(`/products/${item.id}`)}
+            >
               <Image
                 className="rounded"
                 src={item.image_url || 'default_image_url'}
