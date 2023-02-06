@@ -4,8 +4,7 @@ import { Global } from '@emotion/react';
 import { globalStyles } from '../components/commons/stlyes/globalStyles';
 import Layout from '../components/commons/layout/Layout';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-// import { GoogleOAuthProvider } from '@react-oauth/google';
-// import { CLIENT_ID } from 'src/constants/googleAuth';
+
 import { SessionProvider } from 'next-auth/react';
 import LayoutHeader from 'src/components/commons/layout/LayoutHeader';
 import LayoutFooter from 'src/components/commons/layout/LayoutFooter';
@@ -21,7 +20,6 @@ export default function App({
   });
   return (
     <>
-      {/* <GoogleOAuthProvider clientId={CLIENT_ID}> */}
       <SessionProvider session={session}>
         <QueryClientProvider client={queryClient}>
           <Global styles={globalStyles} />
@@ -30,7 +28,6 @@ export default function App({
           <LayoutFooter />
         </QueryClientProvider>
       </SessionProvider>
-      {/* </GoogleOAuthProvider> */}
     </>
   );
 

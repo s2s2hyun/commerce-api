@@ -9,11 +9,12 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { products } from '@prisma/client';
 import { format } from 'date-fns';
 import { CATEGORY_MAP } from 'src/constants/products';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@mantine/core';
 import { IconHeart, IconHeartbeat } from '@tabler/icons';
 import MyHeart from 'src/components/commons/stlyes/MyHeart';
 import { useSession } from 'next-auth/react';
+import MyHeartBeat from 'src/components/commons/stlyes/MyHeart copy';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const product = await fetch(
@@ -31,6 +32,7 @@ export default function Products(props: {
   const router = useRouter();
   const { data: session } = useSession();
   const { id: productId } = router.query;
+  const queryClient = useQueryClient();
   const [editorState] = useState<EditorState | undefined>(() =>
     props.product.contents
       ? EditorState.createWithContent(
@@ -38,17 +40,94 @@ export default function Products(props: {
         )
       : EditorState.createEmpty()
   );
+
   const { data: wishlist } = useQuery(['/api/get-wishlist'], () =>
     fetch('/api/get-wishlist')
       .then((res) => res.json())
       .then((data) => data.items)
   );
 
+  const { mutate, isLoading } = useMutation<unknown, unknown, string, any>(
+    (productId: string) =>
+      fetch('/api/update-wishlist', {
+        method: 'POST',
+        body: JSON.stringify({ productId }),
+      })
+        .then((res) => res.json())
+        .then((data) => data.items),
+    {
+      onMutate: async (productId) => {
+        //찜하기 업데이트
+        await queryClient.cancelQueries(['/api/get-wishlist']);
+
+        const previous = queryClient.getQueryData(['/api/get-wishlist']);
+
+        queryClient.setQueryData<string[]>(['/api/get-wishlist'], (old) =>
+          old
+            ? old.includes(String(productId))
+              ? old.filter((id) => id !== String(productId))
+              : old.concat(String(productId))
+            : []
+        );
+
+        return { previous };
+      },
+      onError: (error, _, context) => {
+        queryClient.setQueryData(['/api/get-wishlist'], context.previous);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries(['/api/get-wishlist']);
+      },
+    }
+  );
+
+  // const { mutate, isLoading } = useMutation<unknown, unknown, string, any>(
+  //   (productId: string) =>
+  //     fetch('/api/update-wishlist', {
+  //       method: 'POST',
+  //       body: JSON.stringify({ productId }),
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => data.items),
+  //   {
+  //     onMutate: async (productId) => {
+  //       //찜하기 업데이트 바로 반영
+  //       await queryClient.cancelQueries(['/api/get-wishlist']);
+
+  //       // Snapshot the previous value
+  //       const previous = queryClient.getQueryData(['/api/get-wishlist']);
+
+  //       // Optimistically update to the new value
+  //       queryClient.setQueryData<string[]>(['/api/get-wishlist'], (old) =>
+  //         old
+  //           ? old.includes(String(productId))
+  //             ? old.filter((id) => id !== String(productId))
+  //             : old.concat(String(productId))
+  //           : []
+  //       );
+
+  //       // Return a context object with the snapshotted value
+  //       return { previous };
+  //     },
+  //     onError: (error, _, context) => {
+  //       queryClient.setQueryData(['/api/get-wishlist'], context.previous);
+  //     },
+  //     onSuccess: () => {
+  //       queryClient.invalidateQueries(['/api/get-wishlist']);
+  //     },
+  //   }
+  // );
+
   const product = props.product;
 
-  const isWished = wishlist ? wishlist.includes(productId) : false;
+  const isWished =
+    wishlist != null && productId != null
+      ? wishlist.includes(String(productId))
+      : false;
 
   // EditorState.createEmpty()
+
+  console.log(typeof productId);
 
   return (
     <>
@@ -57,7 +136,6 @@ export default function Products(props: {
           <div style={{ maxWidth: 800, marginRight: 52 }}>
             <Carousel
               animation="zoom"
-              autoplay
               withoutControls={true}
               wrapAround
               speed={5}
@@ -95,10 +173,11 @@ export default function Products(props: {
             <div className="text-lg">
               {product.price.toLocaleString('ko-kr')}원
             </div>
-            <>{wishlist}tt</>
+            <>{JSON.stringify(wishlist)}딱 대</>
             <Button
+              loading={isLoading}
               style={{ backgroundColor: isWished ? 'red' : 'blue' }}
-              leftIcon={isWished ? <IconHeartbeat /> : <MyHeart />}
+              leftIcon={isWished ? <MyHeartBeat /> : <MyHeart />}
               styles={{ root: { paddingRight: 14, height: 48 } }}
               onClick={() => {
                 if (session == null) {
@@ -106,6 +185,7 @@ export default function Products(props: {
                   router.push('/auth/login');
                   return;
                 }
+                mutate(String(productId));
               }}
             >
               찜하기

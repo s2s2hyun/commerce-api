@@ -6,7 +6,7 @@ import { authOption } from './auth/[...nextauth]';
 
 const prisma = new PrismaClient();
 
-async function getWishlist(userId: string, productId: string) {
+async function updateWishlist(userId: string, productId: string) {
   try {
     const wishlist = await prisma.wishlist.findUnique({
       where: {
@@ -57,12 +57,13 @@ export default async function handler(
 ) {
   const session = await getSession({ req });
   const { productId } = JSON.parse(req.body);
+  console.log(productId);
   if (session == null) {
     res.status(200).json({ items: [], message: `no session ` });
     return;
   }
   try {
-    const wishlist = await getWishlist(
+    const wishlist = await updateWishlist(
       String(session.user.id),
       String(productId)
     );

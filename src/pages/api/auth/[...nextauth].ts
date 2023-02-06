@@ -22,9 +22,12 @@ export const authOption: NextAuthOptions = {
   },
   callbacks: {
     session: async ({ session, user }) => {
-      // Add an 'id' property to the session object
-      session.user.id = user.id;
-      return Promise.resolve(session);
+      return {
+        ...session,
+        user: {
+          id: user.id,
+        },
+      };
     },
   },
 };

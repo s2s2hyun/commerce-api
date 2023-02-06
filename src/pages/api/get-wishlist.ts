@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { getServerSession } from 'next-auth';
 import { getSession } from 'next-auth/react';
+import { authOption } from './auth/[...nextauth]';
 
 const prisma = new PrismaClient();
 
@@ -31,12 +33,13 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const session = await getSession({ req });
+  // console.log(session?.user.id);
   if (session == null) {
     res.status(200).json({ items: [], message: `no Session ` });
     return;
   }
   try {
-    const wishlist = await getWishlist(String(session?.user?.id));
+    const wishlist = await getWishlist(String(session.user.id));
     res.status(200).json({ items: wishlist, message: `Success 맞어?` });
   } catch (err) {
     res.status(400).json({ message: `Fail  ` });
