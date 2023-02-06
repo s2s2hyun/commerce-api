@@ -7,7 +7,8 @@ export const globalStyles = css`
     box-sizing: border-box;
   }
   html {
-    font-size: 62.5%;
+    /* font-size: 62.5%; */
+    font-size: 75%;
     margin: 0;
     box-sizing: border-box;
     font-family: 'Happiness-Sans-Title', 'Roboto';

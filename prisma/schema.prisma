@@ -16,14 +16,14 @@ model categories {
 
 model products {
   id          Int      @id @default(autoincrement())
-  name        String
-  image_url   String?
-  category_id Int
-  createdAt   DateTime @default(now())
-  contents    String?
-  price       Int
+  name        String   @db.VarChar(255)
+  image_url   String?  @db.VarChar(255)
+  category_id Int?
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  contents    String?  @db.Text
+  price       Int      @default(20000)
 
-  @@index([category_id])
+  @@index([category_id], map: "category_id_idx")
 }
 
 model user {
@@ -79,8 +79,7 @@ model VerificationToken {
 }
 
 model Wishlist {
-  id          Int      @id @default(autoincrement())
-  user String @unique
+  id         Int    @id @default(autoincrement())
+  userId     String @unique
   productIds String
-  
 }

@@ -1,11 +1,12 @@
 import React from 'react';
+import LayoutHeader from './LayoutHeader';
 
-interface ILayoutProps {
-  children: React.ReactNode;
-}
+// interface ILayoutProps {
+//   children: React.ReactNode;
+// }
 
-const Layout = (props: ILayoutProps) => {
-  return <div>{props.children}</div>;
+const Layout = () => {
+  return <LayoutHeader />;
 };
 
 export default Layout;

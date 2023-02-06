@@ -3,11 +3,11 @@ import NextAuth, { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import { PrismaClient } from '@prisma/client';
-// import prisma from "../../../lib/prismadb"
+// import prisma from '../../../../ilb/prismadb';
 
 const prisma = new PrismaClient();
 
-const authOption: NextAuthOptions = {
+export const authOption: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -18,7 +18,14 @@ const authOption: NextAuthOptions = {
 
   session: {
     strategy: 'database',
-    maxAge: 30 * 24 * 60 * 60,
+    maxAge: 1 * 24 * 60 * 60,
+  },
+  callbacks: {
+    session: async ({ session, user }) => {
+      // Add an 'id' property to the session object
+      session.user.id = user.id;
+      return Promise.resolve(session);
+    },
   },
 };
 

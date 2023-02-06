@@ -7,6 +7,13 @@ import { useRouter } from 'next/router';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { products } from '@prisma/client';
+import { format } from 'date-fns';
+import { CATEGORY_MAP } from 'src/constants/products';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from '@mantine/core';
+import { IconHeart, IconHeartbeat } from '@tabler/icons';
+import MyHeart from 'src/components/commons/stlyes/MyHeart';
+import { useSession } from 'next-auth/react';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const product = await fetch(
@@ -22,6 +29,7 @@ export default function Products(props: {
 }) {
   const [index, setIndex] = useState<number>(0);
   const router = useRouter();
+  const { data: session } = useSession();
   const { id: productId } = router.query;
   const [editorState] = useState<EditorState | undefined>(() =>
     props.product.contents
@@ -30,41 +38,85 @@ export default function Products(props: {
         )
       : EditorState.createEmpty()
   );
+  const { data: wishlist } = useQuery(['/api/get-wishlist'], () =>
+    fetch('/api/get-wishlist')
+      .then((res) => res.json())
+      .then((data) => data.items)
+  );
 
   const product = props.product;
+
+  const isWished = wishlist ? wishlist.includes(productId) : false;
 
   // EditorState.createEmpty()
 
   return (
     <>
-      <div>edit</div>
-      <Carousel
-        animation="zoom"
-        autoplay
-        withoutControls={true}
-        wrapAround
-        speed={5}
-        slideIndex={index}
-      >
-        {product.images.map((url, index) => (
-          <Image
-            key={`${url}-carousel-${index}`}
-            src={url}
-            alt="img"
-            width={500}
-            height={300}
-          />
-        ))}
-      </Carousel>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {product.images.map((url, index) => (
-          <div key={`${url}-thumb-${index}`} onClick={() => setIndex(index)}>
-            <Image src={url} alt="img" width={100} height={100} />
+      {product != null && productId != null ? (
+        <div className="p-24 flex flex-row">
+          <div style={{ maxWidth: 800, marginRight: 52 }}>
+            <Carousel
+              animation="zoom"
+              autoplay
+              withoutControls={true}
+              wrapAround
+              speed={5}
+              slideIndex={index}
+            >
+              {product.images.map((url, index) => (
+                <Image
+                  key={`${url}-carousel-${index}`}
+                  src={url}
+                  alt="img"
+                  width={600}
+                  height={400}
+                />
+              ))}
+            </Carousel>
+            <div className="flex space-x-4 mt-2">
+              {product.images.map((url, index) => (
+                <div
+                  key={`${url}-thumb-${index}`}
+                  onClick={() => setIndex(index)}
+                >
+                  <Image src={url} alt="img" width={150} height={150} />
+                </div>
+              ))}
+            </div>
+            {editorState != null && (
+              <CustomEditor editorState={editorState} readOnly={true} />
+            )}
           </div>
-        ))}
-      </div>
-      {editorState != null && (
-        <CustomEditor editorState={editorState} readOnly={true} />
+          <div style={{ maxWidth: 600 }} className="flex flex-col space-y-6">
+            <div className="text-lg text-zinc-400">
+              {CATEGORY_MAP[product.category_id - 1]}
+            </div>
+            <div className="text-lg font-semibold">{product.name}</div>
+            <div className="text-lg">
+              {product.price.toLocaleString('ko-kr')}원
+            </div>
+            <>{wishlist}tt</>
+            <Button
+              style={{ backgroundColor: isWished ? 'red' : 'blue' }}
+              leftIcon={isWished ? <IconHeartbeat /> : <MyHeart />}
+              styles={{ root: { paddingRight: 14, height: 48 } }}
+              onClick={() => {
+                if (session == null) {
+                  alert('로그인이 필요합니다.');
+                  router.push('/auth/login');
+                  return;
+                }
+              }}
+            >
+              찜하기
+            </Button>
+            <div className="text-lg text-zinc-300">
+              등록 {format(new Date(product.createdAt), 'yyyy년 M월 d일')}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div>로딩중</div>
       )}
     </>
   );

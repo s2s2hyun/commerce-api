@@ -22,7 +22,7 @@ async function signUp(credential: string) {
         image: decoded.picture,
       },
     });
-    console.log(decoded);
+    console.log(response);
     return decoded;
   } catch (err) {
     console.log(err);
@@ -41,7 +41,7 @@ export default async function handler(
   const { credential } = req.query;
   try {
     const tokens = await signUp(String(credential));
-    res.status(200).json({ items: tokens, message: `Success ` });
+    res.status(200).json({ items: tokens, message: `Success` });
   } catch (err) {
     res.status(400).json({ message: `Fail  ` });
   }

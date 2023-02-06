@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 // import { GoogleOAuthProvider } from '@react-oauth/google';
 // import { CLIENT_ID } from 'src/constants/googleAuth';
 import { SessionProvider } from 'next-auth/react';
+import LayoutHeader from 'src/components/commons/layout/LayoutHeader';
+import LayoutFooter from 'src/components/commons/layout/LayoutFooter';
 
 export default function App({
   Component,
@@ -23,9 +25,9 @@ export default function App({
       <SessionProvider session={session}>
         <QueryClientProvider client={queryClient}>
           <Global styles={globalStyles} />
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
+          <LayoutHeader />
+          <Component {...pageProps} />
+          <LayoutFooter />
         </QueryClientProvider>
       </SessionProvider>
       {/* </GoogleOAuthProvider> */}
