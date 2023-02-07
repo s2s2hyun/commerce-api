@@ -13,6 +13,7 @@ const nextConfig = {
       'ithk-pro-itmall-item.oss-cn-hongkong.aliyuncs.com',
       'cdn.mustit.co.kr',
       'image.mustit.co.kr',
+      'lh3.googleusercontent.com',
     ],
   },
 };

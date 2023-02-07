@@ -1,19 +1,11 @@
 import styled from '@emotion/styled';
 import React from 'react';
 
-// interface Props {
-//   children: string;
-//   onClick: () => void;
-// }
-
-// const Button = ({ children, onClick }: Props) => {
-//   return <button onClick={onClick}>{children}</button>;
-// };
-
 const Button = styled.button`
-  padding: 16px;
+  padding: 8px;
   border-radius: 8px;
   background-color: hotpink;
+  color: #ffffff;
 `;
 
 export default Button;

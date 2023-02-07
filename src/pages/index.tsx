@@ -6,11 +6,9 @@ import { Input, Pagination, SegmentedControl, Select } from '@mantine/core';
 import { CATEGORY_MAP, FILTERS, TAKE } from 'src/constants/products';
 import { IconSearch } from '@tabler/icons';
 // import MyIcon from '../../components/commons/stlyes/MyIcon';
-import MyIcon from '../components/commons/stlyes/MyIcon';
+import MyIcon from '../components/commons/stlyes/svgIcon/MyIcon';
 import useDebounce from 'hooks/useDebounce';
 import { useQuery } from '@tanstack/react-query';
-import { Session } from 'inspector';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
 // const TAKE = 9;
@@ -20,7 +18,6 @@ type Category = {
 };
 
 export default function Home() {
-  const { data: session } = useSession();
   const [activePage, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
 
@@ -83,11 +80,7 @@ export default function Home() {
   };
 
   return (
-    <div className="px-36 mt-36 mb-36">
-      {session && (
-        <p style={{ fontSize: '2rem' }}>안녕하세요 , {session.user?.name}님</p>
-      )}
-
+    <div className=" mt-36 mb-36">
       <div className="mb-4">
         <Input
           placeholder="search"
@@ -144,7 +137,7 @@ export default function Home() {
                 </span>
               </div>
               <span className="text-zinc-400">
-                {CATEGORY_MAP[item.category_id - 1]}
+                {CATEGORY_MAP[item.category_id ? item.category_id - 1 : 0]}
               </span>
             </div>
           ))}

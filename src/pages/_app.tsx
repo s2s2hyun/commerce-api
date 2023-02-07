@@ -23,9 +23,11 @@ export default function App({
       <SessionProvider session={session}>
         <QueryClientProvider client={queryClient}>
           <Global styles={globalStyles} />
-          <LayoutHeader />
-          <Component {...pageProps} />
-          <LayoutFooter />
+          <div className="px-36">
+            <LayoutHeader />
+            <Component {...pageProps} />
+            <LayoutFooter />
+          </div>
         </QueryClientProvider>
       </SessionProvider>
     </>
