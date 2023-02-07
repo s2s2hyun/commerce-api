@@ -28,10 +28,10 @@ export async function getStaticProps() {
   };
 }
 
-ISR.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <Layout>
-      <SubLayout>{page}</SubLayout>
-    </Layout>
-  );
-};
+// ISR.getLayout = function getLayout(page: React.ReactNode) {
+//   return (
+//     <Layout>
+//       <SubLayout>{page}</SubLayout>
+//     </Layout>
+//   );
+// };

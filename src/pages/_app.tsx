@@ -26,14 +26,10 @@ export default function App({
           <div className="px-36">
             <LayoutHeader />
             <Component {...pageProps} />
-            <LayoutFooter />
+            {/* <LayoutFooter /> */}
           </div>
         </QueryClientProvider>
       </SessionProvider>
     </>
   );
-
-  // const getLayout =
-  //   Component.getLayout || ((page: React.ReactNode) => <Layout>{page}</Layout>);
-  // return getLayout(<Component {...pageProps} />);
 }

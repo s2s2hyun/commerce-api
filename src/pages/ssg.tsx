@@ -25,10 +25,10 @@ export async function getStaticProps() {
   };
 }
 
-SSG.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <Layout>
-      <SubLayout>{page}</SubLayout>
-    </Layout>
-  );
-};
+// SSG.getLayout = function getLayout(page: React.ReactNode) {
+//   return (
+//     <Layout>
+//       <SubLayout>{page}</SubLayout>
+//     </Layout>
+//   );
+// };
