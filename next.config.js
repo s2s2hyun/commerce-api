@@ -14,6 +14,7 @@ const nextConfig = {
       'cdn.mustit.co.kr',
       'image.mustit.co.kr',
       'lh3.googleusercontent.com',
+      'source.unsplash.com',
     ],
   },
 };

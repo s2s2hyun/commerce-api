@@ -26,7 +26,7 @@ export default function App({
           <div className="px-36">
             <LayoutHeader />
             <Component {...pageProps} />
-            {/* <LayoutFooter /> */}
+            <LayoutFooter />
           </div>
         </QueryClientProvider>
       </SessionProvider>

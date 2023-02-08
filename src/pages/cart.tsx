@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Button } from '@mantine/core';
-import { Cart, products } from '@prisma/client';
+import { Cart, OrderItem, products } from '@prisma/client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import IconRefresh from 'src/components/commons/stlyes/svgIcon/IconRefresh';
 import MyShopCart from 'src/components/commons/stlyes/svgIcon/MyShopCart';
 import { CountControl } from 'src/components/CountControl';
 import { CATEGORY_MAP } from 'src/constants/products';
+import { ORDER_QUERY_KEY } from './mypage';
 
 interface CartItem extends Cart {
   name: string;
@@ -22,13 +23,37 @@ export const CART_QUERY_KEY = '/api/get-cart';
 
 export default function CartPage() {
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const { data } = useQuery<{ items: Cart[] }, unknown, CartItem[]>(
     [`/api/get-cart`],
     () =>
       fetch(`/api/get-cart`)
         .then((res) => res.json())
         .then((data) => data.items)
+  );
+
+  const { mutate: addOrder } = useMutation<
+    unknown,
+    unknown,
+    Omit<OrderItem, 'id'>[],
+    any
+  >(
+    (items) =>
+      fetch(ORDER_QUERY_KEY, {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      })
+        .then((res) => res.json())
+        .then((data) => data.items),
+
+    {
+      onMutate: () => {
+        queryClient.invalidateQueries([ORDER_QUERY_KEY]);
+      },
+      onSuccess: () => {
+        router.push('/mypage');
+      },
+    }
   );
 
   const diliveryAmount = data && data.length > 0 ? 5000 : 0;
@@ -56,7 +81,17 @@ export default function CartPage() {
   );
 
   const ClickOrder = () => {
-    //TODO: 주문하기 기능 구현
+    if (data == null) {
+      return;
+    }
+    addOrder(
+      data?.map((cart) => ({
+        productId: cart.productId,
+        price: cart.price,
+        amount: cart.amount,
+        quantity: cart.quantity,
+      }))
+    );
     alert(`장바구니에서 ${JSON.stringify(data)} 구매`);
   };
 

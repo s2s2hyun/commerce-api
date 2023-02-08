@@ -13,23 +13,30 @@ const Editor = dynamic<EditorProps>(
   }
 );
 
-const Wrapper = styled.div`
-  padding: 1rem;
+const Wrapper = styled.div<{ readOnly: boolean; noPadding: boolean }>`
+  /* padding: 1rem; */
+  ${(props) => (props.noPadding ? '' : 'padding: 1rem')}
+  /* border: 1px solid black;
+  border-radius: 8px; */
+  ${(props) =>
+    props.readOnly ? '' : 'border: 1px solid black; border-radius:8px; '}
 `;
 
 export default function CustomEditor({
   editorState,
   readOnly = false,
+  noPadding = false,
   onEditorStateChange,
   onSave,
 }: {
   editorState: EditorState;
   readOnly?: boolean;
+  noPadding?: boolean;
   onSave?: () => void;
   onEditorStateChange?: Dispatch<SetStateAction<EditorState | undefined>>;
 }) {
   return (
-    <Wrapper>
+    <Wrapper readOnly={readOnly} noPadding={noPadding}>
       <Editor
         readOnly={readOnly}
         editorState={editorState}

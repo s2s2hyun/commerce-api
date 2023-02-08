@@ -6,7 +6,7 @@ import CustomEditor from 'src/components/Editor';
 import { useRouter } from 'next/router';
 import { convertFromRaw, convertToRaw, EditorState } from 'draft-js';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { Cart, products } from '@prisma/client';
+import { Cart, OrderItem, products } from '@prisma/client';
 import { format } from 'date-fns';
 import { CATEGORY_MAP } from 'src/constants/products';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -18,6 +18,8 @@ import MyHeartBeat from 'src/components/commons/stlyes/svgIcon/MyHeartBeat';
 import MyShopCart from 'src/components/commons/stlyes/svgIcon/MyShopCart';
 import { CountControl } from 'src/components/CountControl';
 import { CART_QUERY_KEY } from 'src/pages/cart';
+import { ORDER_QUERY_KEY } from 'src/pages/mypage';
+import CommentItem from 'src/components/CommentItem';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const product = await fetch(
@@ -25,11 +27,26 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   )
     .then((data) => data.json())
     .then((data) => data.items);
-  return { props: { product: { ...product, images: [product.image_url] } } };
+
+  const comments = await fetch(
+    `http://localhost:3000/api/get-comments?productId=${context.params?.id}`
+  )
+    .then((data) => data.json())
+    .then((data) => data.items);
+
+  return {
+    props: {
+      product: { ...product, images: [product.image_url, product.image_url] },
+      comments: comments,
+    },
+  };
 }
+
+export interface CommentItemType extends Comment, OrderItem {}
 
 export default function Products(props: {
   product: products & { images: string[] };
+  comments: CommentItemType[];
 }) {
   const [index, setIndex] = useState<number>(0);
 
@@ -112,6 +129,30 @@ export default function Products(props: {
     }
   );
 
+  const { mutate: addOrder } = useMutation<
+    unknown,
+    unknown,
+    Omit<OrderItem, 'id'>[],
+    any
+  >(
+    (items) =>
+      fetch(ORDER_QUERY_KEY, {
+        method: 'POST',
+        body: JSON.stringify({ items }),
+      })
+        .then((res) => res.json())
+        .then((data) => data.items),
+
+    {
+      onMutate: () => {
+        queryClient.invalidateQueries([ORDER_QUERY_KEY]);
+      },
+      onSuccess: () => {
+        router.push('/mypage');
+      },
+    }
+  );
+
   const validate = (type: 'cart' | 'order') => {
     if (quantity == null) {
       alert('장바구니로 이동');
@@ -123,6 +164,16 @@ export default function Products(props: {
         quantity: quantity,
         amount: product.price * quantity,
       });
+    }
+    if (type == 'order') {
+      addOrder([
+        {
+          productId: product.id,
+          quantity: quantity,
+          amount: product.price * quantity,
+          price: product.price,
+        },
+      ]);
     }
   };
 
@@ -170,6 +221,13 @@ export default function Products(props: {
             {editorState != null && (
               <CustomEditor editorState={editorState} readOnly={true} />
             )}
+            <div>
+              <p className="text-2xl font-semibold">후기</p>
+              {props.comments &&
+                props.comments.map((comment, index) => (
+                  <CommentItem key={index} item={comment} />
+                ))}
+            </div>
           </div>
           <div style={{ maxWidth: 600 }} className="flex flex-col space-y-6">
             <div className="text-lg text-zinc-400">
@@ -227,6 +285,25 @@ export default function Products(props: {
                 찜하기
               </Button>
             </div>
+            <Button
+              loading={isLoading}
+              style={{ backgroundColor: 'black' }}
+              // radius="xl"
+              styles={{
+                root: { paddingRight: 14, height: 48, width: '20.3rem' },
+              }}
+              size="md"
+              onClick={() => {
+                if (session == null) {
+                  alert('로그인이 필요합니다.');
+                  router.push('/auth/login');
+                  return;
+                }
+                validate('order');
+              }}
+            >
+              구매하기
+            </Button>
             <div className="text-lg text-zinc-300">
               등록 {format(new Date(product.createdAt), 'yyyy년 M월 d일')}
             </div>

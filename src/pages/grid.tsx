@@ -53,7 +53,7 @@ const GridPage = () => {
       <CssBaseline />
       <AppBar>
         <Toolbar>
-          <PhotoCamera className={classes.icon} />
+          {/* <PhotoCamera className={classes.icon} /> */}
           <Typography variant="h6">Photo Album</Typography>
         </Toolbar>
       </AppBar>
