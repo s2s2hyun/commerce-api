@@ -38,10 +38,10 @@ const UserNameInfo = () => {
 
 export default UserNameInfo;
 
-UserNameInfo.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <Layout>
-      <SubLayout>{page}</SubLayout>
-    </Layout>
-  );
-};
+// UserNameInfo.getLayout = function getLayout(page: React.ReactNode) {
+//   return (
+//     <Layout>
+//       <SubLayout>{page}</SubLayout>
+//     </Layout>
+//   );
+// };
