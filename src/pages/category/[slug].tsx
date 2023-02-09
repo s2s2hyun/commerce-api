@@ -19,10 +19,10 @@ const CategorySlug = () => {
 
 export default CategorySlug;
 
-CategorySlug.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <Layout>
-      <SubLayout>{page}</SubLayout>
-    </Layout>
-  );
-};
+// CategorySlug.getLayout = function getLayout(page: React.ReactNode) {
+//   return (
+//     <Layout>
+//       <SubLayout>{page}</SubLayout>
+//     </Layout>
+//   );
+// };
