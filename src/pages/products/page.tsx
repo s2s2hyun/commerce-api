@@ -58,25 +58,6 @@ export default function Products() {
   );
 
   const categories = data;
-  // const [categories, setCategories] = useState<categories[]>([]); 위에 주석처리를 해두었다.
-
-  // 카테고리 변경에 따라 일부 부작용을 수행하려는 경우 useEffect 를 사용할수 있다.
-  // useEffect(() => {
-  //   console.log(categories);
-  // }, [categories]);
-
-  // useEffect(() => {
-  //   fetch(
-  //     `/api/get-products-count?category=${selectedCategory}&contains=${debouncedKeyword}`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       if (data.items) {
-  //         setTotal(Math.ceil(data.items / TAKE));
-  //       }
-  //     })
-  //     .catch((error) => console.log(error));
-  // }, [selectedCategory, debouncedKeyword]);
 
   const { data: totalData } = useQuery(
     [
@@ -90,21 +71,6 @@ export default function Products() {
         .then((data) => Math.ceil(data.items / TAKE))
   );
 
-  // react Query 셋팅전에 주석처리
-  // useEffect(() => {
-  //   const skip = TAKE * (activePage - 1);
-  //   fetch(
-  //     `/api/get-products?skip=${skip}&take=${TAKE}&category=${selectedCategory}&orderBy=${selectedFilter}&contains=${debouncedKeyword}`
-  //   )
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       if (data.items) {
-  //         setProducts(data.items);
-  //       }
-  //     })
-  //     .catch((error) => console.log(error));
-  // }, [activePage, selectedCategory, selectedFilter, debouncedKeyword]);
-  // useEffect 가 아닌 react Query 를 통해서 api 호출
   const { data: products } = useQuery<
     { items: products[] },
     unknown,
@@ -199,7 +165,7 @@ export default function Products() {
               </div>
               <span className="text-zinc-400">
                 {/* {item.category_id === 1 && '의류'} */}
-                {CATEGORY_MAP[item.category_id - 1]}
+                {CATEGORY_MAP[item.category_id ? item.category_id - 1 : 0]}
               </span>
             </div>
           ))}
