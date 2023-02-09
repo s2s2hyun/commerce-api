@@ -5,7 +5,7 @@ import styled from '@emotion/styled';
 import { Input, Pagination, SegmentedControl, Select } from '@mantine/core';
 import { CATEGORY_MAP, FILTERS, TAKE } from 'src/constants/products';
 import { IconSearch } from '@tabler/icons';
-import MyIcon from '../../components/commons/stlyes/MyIcon';
+import MyIcon from '../../components/commons/stlyes/svgIcon/MyIcon';
 import useDebounce from 'hooks/useDebounce';
 import { useQuery } from '@tanstack/react-query';
 import { Session } from 'inspector';
