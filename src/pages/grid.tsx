@@ -11,9 +11,7 @@ import {
   Container,
 } from '@mui/material';
 import React from 'react';
-import { PhotoCamera } from '@mui/icons-material';
 import Button from '@mui/material/Button';
-import ButtonGroup from '@mui/material/ButtonGroup';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
