@@ -53,10 +53,10 @@ const MyInfo = () => {
 
 export default MyInfo;
 
-MyInfo.getLayout = function getLayout(page: React.ReactNode) {
-  return (
-    <Layout>
-      <SubLayout>{page}</SubLayout>
-    </Layout>
-  );
-};
+// MyInfo.getLayout = function getLayout(page: React.ReactNode) {
+//   return (
+//     <Layout>
+//       <SubLayout>{page}</SubLayout>
+//     </Layout>
+//   );
+// };
