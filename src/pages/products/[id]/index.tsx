@@ -23,13 +23,13 @@ import CommentItem from 'src/components/CommentItem';
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const product = await fetch(
-    `http://localhost:3000/api/get-product?id=${context.params?.id}`
+    `${process.env.NEXTAUTH_URL}/api/get-product?id=${context.params?.id}`
   )
     .then((data) => data.json())
     .then((data) => data.items);
 
   const comments = await fetch(
-    `http://localhost:3000/api/get-comments?productId=${context.params?.id}`
+    `${process.env.NEXTAUTH_URL}/api/get-comments?productId=${context.params?.id}`
   )
     .then((data) => data.json())
     .then((data) => data.items);
