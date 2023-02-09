@@ -42,12 +42,12 @@ export default function ImageUpload() {
       <Button onClick={ClickUpload}>업로드</Button>
       {image != '' && (
         <AutoSizeImageWrapper>
-          <Image
+          {/* <Image
             src={image}
             alt="uploadImg"
             layout="fill"
             objectFit="contain"
-          />
+          /> */}
         </AutoSizeImageWrapper>
       )}
     </div>
