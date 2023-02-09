@@ -48,8 +48,9 @@ export default function LayoutHeader() {
             src={session.user?.image!}
             width={30}
             height={30}
-            style={{ borderRadius: '50%' }}
+            style={{ borderRadius: '50%', cursor: 'pointer' }}
             alt="photo"
+            onClick={() => router.push('/mypage')}
           />
         ) : (
           <div

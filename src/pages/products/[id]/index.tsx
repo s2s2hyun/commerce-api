@@ -42,7 +42,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-export interface CommentItemType extends Comment, OrderItem {}
+export interface CommentItemType extends Comment, OrderItem {
+  rate: number;
+  contents: string;
+  updatedAt: string | number | Date;
+}
 
 export default function Products(props: {
   product: products & { images: string[] };

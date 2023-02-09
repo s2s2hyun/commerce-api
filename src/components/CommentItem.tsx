@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
 import format from 'date-fns/format';
+import { convertFromRaw, EditorState } from 'draft-js';
 import { CommentItemType } from 'src/pages/products/[id]';
 import CommenRateIcon from './commons/stlyes/svgIcon/CommenRateIcon';
+import CustomEditor from './Editor';
 
 const Warpper = styled.div`
   border: 1px solid black;
@@ -33,10 +35,16 @@ export default function CommentItem({ item }: { item: CommentItemType }) {
             </span>
           </div>
           <p className="text-zinc-300 ml-auto">
-            {/* {format(new Date(item?.updatedAt), 'yyyy년 M월 d일')} */}
-            날짜타입 다시
+            {format(new Date(item?.updatedAt), 'yyyy년 M월 d일')}
           </p>
         </div>
+        <CustomEditor
+          editorState={EditorState.createWithContent(
+            convertFromRaw(JSON.parse(item.contents ?? ''))
+          )}
+          readOnly
+          noPadding
+        />
       </div>
     </Warpper>
   );
